@@ -1,4 +1,4 @@
-
+from user import mainmenu
 import os
 import json
 
@@ -27,9 +27,9 @@ def nxtanswermode(answermode,mode=0):
     if mode == 1:
         answermode = answermode + ' '
     if mode == 2:
-        if answermode == "user":
-            return "pass"
-        elif answermode == "pass":
+        if answermode == "username":
+            return "password"
+        elif answermode == "password":
             return "done"
 
 def clear():
@@ -59,6 +59,8 @@ def signup():
     answermode = "username"
     while answering:
         clear()
+        if answermode == "done":
+            break
         print(blue + "Hello New User! Answer the questions below to make a new account\n")
         print(blue+"╔════SIGN UP════════════════════════════════════╗")
         print(blue+"╠═══════════════════════════════════════════════╣")
@@ -73,11 +75,9 @@ def signup():
         print(blue+"╚═══════════════════════════════════════════════╝")
         print(blue+"Please input a "+answermode.title())
         key = input()
-        if answermode == "done":
-            answering = False
 
                 
-        elif answermode == "username":
+        if answermode == "username":
             username = key
             userspaces = signupcut(username)
             answermode = nxtanswermode('username')
@@ -103,72 +103,78 @@ def signup():
             agespaces = signupcut(age)
             answermode = nxtanswermode('age')
 
-    with open('users/'+username+'.json') as file:
+    with open('users/'+username+'.json','w') as file:
         dict = {
             'username':username,
             'password':password,
             'first name':firstname,
             'last name': lastname,
-            'age':age
+            'age':age,
+            'messages':{},
+            'friends':[],
+            'about me':""
         }
-        json.dump(dict,file)
+        json.dump(dict,file,indent=4)
     clear()
     print("Successfully Made Account! [any key]")
     bruh = input()
-    login()
 
 
 def login():
     clear()
-    userspaces = "                                 "
-    username = ""
-    passwordspaces = "                                 "
-    password = ""
+    userspaces = "                               "
+    usernamee = ""
+    passwordspaces = "                               "
+    passwordd = ""
     
-    answermode = "user"
+    answermode = "username"
     answering = True
     while answering:
-        print(blue+"╔════LOG IN═════════════════════════════════════╗")
+        clear()
+        if answermode == "done":
+            break
+        print(blue+"╔════LOG IN═════════════════════════════════════╗") 
         print(blue+"╠═══════════════════════════════════════════════╣")
         print(blue+"║ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ║")
-        print(blue+"║ ┃Username: "+username+userspaces+"┃ ║")
-        print(blue+"║ ┃Password: "+password+passwordspaces+"┃ ║")
+        print(blue+"║ ┃Username: "+usernamee+userspaces+"  "+"┃ ║")
+        print(blue+"║ ┃Password: "+passwordd+passwordspaces+"  "+"┃ ║")
         print(blue+"║ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ║")
         print(blue+"╚═══════════════════════════════════════════════╝")
-    
-        key = getkey()
-        if key == "`":
-            next = nxtanswermode(answermode, mode=2)
-            answermode = next
-            if answermode == "done":
-                answering = False
-
+        print(blue+"Please input your "+answermode.title())
+        key = input()
                 
-        elif answermode == "user":
-            if key == 'Escape':
-                back =backspace(username)
-                username = back
-                newstr = signupcut(userspaces,mode=1)
-                userspaces = newstr
-            else:
-                username += key
-                newstr = signupcut(userspaces)
-                userspaces = newstr
+        if answermode == "username":
+            usernamee = key
+            userspaces = signupcut(usernamee)
+            answermode = nxtanswermode('username',mode=2)
 
             
-        elif answermode == "pass":
-            if key == 'Escape':
-                back = backspace(password)
-                password = back
-                newstr = signupcut(passwordspaces,mode=1)
-                userspaces = newstr
-            else:
-                password += key
-                newstr = signupcut(passwordspaces)
-                passwordspaces = newstr
+        elif answermode == "password":
+            passwordd = key
+            passwordspaces = signupcut(passwordd)
+            answermode = nxtanswermode('password',mode=2)
+
+
     for file in os.scandir('users'):
-        with open(file,'r') as user:
-            userr = json.load(user)
-            if userr['name'] == username:
-                if userr['password'] == password:
-                    mainmenu('users/'+username)
+        filename = os.path.splitext(os.path.basename(file))[0]
+        if filename == usernamee:
+            with open(file,'r') as user:
+                userr = json.load(user)
+                if userr['password'] == passwordd:
+                    print(blue+"do you want the system to remember you? [Y,N]")
+                    bruh = input()
+                    if bruh.lower() == 'y':
+                        with open('remember','w') as file:
+                            file.write(f"users/{filename}.json")
+                        return 'users/'+usernamee+'.json'
+                    else:
+                        return 'users/'+usernamee+'.json'
+    print(red+"Invalid username or password, to log in again press 'L', to sign up press 'S' ")
+    thing= input()
+    if thing.lower() == 'l':
+        login()
+    elif thing.lower() == 's':
+        signup()
+    else:
+        login()
+    

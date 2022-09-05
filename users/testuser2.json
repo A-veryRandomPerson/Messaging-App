@@ -1,0 +1,27 @@
+{
+    "username": "testuser2",
+    "password": "testuser2",
+    "first name": "bot2",
+    "last name": "bobby",
+    "age": "2",
+    "messages": {
+        "testuser1": [
+            [
+                "hello",
+                2
+            ],
+            [
+                "how are you",
+                2
+            ],
+            [
+                "are you good?",
+                2
+            ]
+        ]
+    },
+    "friends": [
+        "testuser1"
+    ],
+    "about me": ""
+}
